@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';"
+  />
+  <title>Kindle Notes Organizer — Estudio y Exportación Inteligente</title>
+  <link rel="stylesheet" href="./src/styles/main.css" />
+</head>
+<body>
+  <!-- Minimalist Top Header -->
+  <header class="app-header">
+    <div class="brand-group">
+      <div class="brand-icon" aria-hidden="true">
+        <svg class="icon-svg icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+          <path d="M8 7h6" />
+          <path d="M8 11h8" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title">Kindle Notes Organizer</h1>
+        <p class="brand-subtitle">Organizador minimalista de resaltados, notas y capítulos para estudio</p>
+      </div>
+    </div>
+
+    <div class="header-badges">
+      <div id="header-global-stats" class="stats-pill">Cargando catálogo...</div>
+      <div class="security-pill" title="Ejecución 100% aislada en el navegador, sin servidor externo ni conexiones de red (CSP connect-src: none)">
+        <svg class="icon-svg icon-sm" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+        <span>100% Local</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Streamlined 3-Step Workflow Ribbon (Progressive Disclosure) -->
+  <section class="workflow-bar" aria-label="Flujo de trabajo en 3 pasos">
+    <!-- Step 1: Source -->
+    <div class="workflow-step">
+      <div class="step-top">
+        <div class="step-head">
+          <span class="step-number">1</span>
+          <span class="step-title">Origen de datos</span>
+          <span class="step-status-tag">Activo</span>
+        </div>
+        <div id="source-status-desc" class="step-desc">Detectando My Clippings.txt...</div>
+      </div>
+      <div class="step-actions">
+        <button type="button" id="btn-pick-kindle-folder" class="btn btn-secondary">
+          <svg class="icon-svg icon-sm" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+          </svg>
+          <span>Carpeta Kindle</span>
+        </button>
+        <button type="button" id="btn-pick-clippings-file" class="btn btn-ghost" title="Cargar archivo My Clippings.txt manualmente">
+          <svg class="icon-svg icon-sm" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          <span>Cargar .txt</span>
+        </button>
+        <button type="button" id="btn-pick-epubs" class="btn btn-ghost" title="Vincular archivos .epub para extraer el índice real de capítulos">
+          <svg class="icon-svg icon-sm" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+          </svg>
+          <span>Vincular .EPUB</span>
+        </button>
+        <input type="file" id="input-kindle-folder" webkitdirectory directory multiple style="display: none;" />
+        <input type="file" id="input-clippings-file" accept=".txt" style="display: none;" />
+        <input type="file" id="input-epubs" accept=".epub" multiple style="display: none;" />
+      </div>
+    </div>
+
+    <!-- Step 2: Destination & Sync -->
+    <div class="workflow-step">
+      <div class="step-top">
+        <div class="step-head">
+          <span class="step-number">2</span>
+          <span class="step-title">Carpeta de destino</span>
+          <span class="step-optional-tag">Opcional</span>
+        </div>
+        <div id="dest-status-desc" class="step-desc">
+          Elige dónde guardar para detectar exportaciones previas.
+        </div>
+      </div>
+      <div class="step-actions">
+        <button type="button" id="btn-pick-dest-folder" class="btn btn-secondary">
+          <svg class="icon-svg icon-sm" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
+            <path d="M12 10v6" />
+            <path d="m9 13 3 3 3-3" />
+          </svg>
+          <span>Elegir destino</span>
+        </button>
+        <button type="button" id="btn-select-new-updated" class="btn btn-ghost" title="Seleccionar únicamente los libros nuevos o con notas nuevas">
+          <svg class="icon-svg icon-sm" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+            <path d="M16 16h5v5" />
+          </svg>
+          <span>Solo nuevos</span>
+        </button>
+        <input type="file" id="input-dest-folder-fallback" webkitdirectory directory multiple style="display: none;" />
+      </div>
+    </div>
+
+    <!-- Step 3: Customize & Batch Export -->
+    <div class="workflow-step workflow-step-cta">
+      <div class="step-top">
+        <div class="step-head">
+          <span class="step-number step-number-accent">3</span>
+          <span class="step-title">Formato y exportación</span>
+        </div>
+        <div id="config-summary-text" class="step-desc">
+          Word (.docx) + Markdown (.md) • Por capítulos
+        </div>
+      </div>
+      <div class="step-actions step-actions-spread">
+        <button type="button" id="btn-open-config" class="btn btn-secondary" aria-haspopup="dialog" aria-controls="config-drawer-backdrop">
+          <svg class="icon-svg icon-sm" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <span>Personalizar formato</span>
+        </button>
+
+        <button type="button" id="btn-export-selected" class="btn btn-cta">
+          <svg class="icon-svg icon-sm" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" x2="12" y1="15" y2="3" />
+          </svg>
+          <span id="btn-export-selected-label">Exportar seleccionados</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main 2-Column Workspace: Left Book List + Right Full-Height Document Preview -->
+  <main class="workspace-grid">
+    <!-- Left Column: Books Catalog -->
+    <aside class="panel-card left-column" aria-label="Catálogo de libros">
+      <div class="panel-header">
+        <div class="panel-title-wrap">
+          <h2 class="panel-title">Libros detectados</h2>
+          <span id="selected-books-count" class="selection-counter-badge">0 seleccionados</span>
+        </div>
+        <div class="quick-select-group">
+          <button type="button" id="btn-select-all" class="btn btn-ghost btn-xs">Todos</button>
+          <button type="button" id="btn-select-none" class="btn btn-ghost btn-xs">Ninguno</button>
+        </div>
+      </div>
+
+      <div class="catalog-controls">
+        <div class="search-field-wrapper">
+          <svg class="search-field-icon icon-svg icon-sm" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            type="search"
+            id="catalog-search-input"
+            class="search-input has-icon"
+            placeholder="Buscar por título o autor..."
+            aria-label="Buscar libro por título o autor"
+          />
+        </div>
+
+        <div id="catalog-filter-pills" class="filter-pills" role="tablist" aria-label="Filtrar libros"></div>
+
+        <div class="selection-bar">
+          <label class="checkbox-label">
+            <input type="checkbox" id="cfg-show-system-book" />
+            <span>Mostrar «Mis recortes» del sistema</span>
+          </label>
+        </div>
+      </div>
+
+      <div id="books-catalog-list" class="books-list"></div>
+    </aside>
+
+    <!-- Right Column: Full-Height Document Preview -->
+    <section class="right-column" aria-label="Vista previa del documento">
+      <div class="panel-card preview-card">
+        <div class="preview-toolbar">
+          <div class="preview-toolbar-left">
+            <h2 id="preview-book-header-title" class="preview-book-heading">Vista Previa</h2>
+            <div class="preview-tabs" role="tablist" aria-label="Modo de vista previa">
+              <button type="button" class="preview-tab active" data-preview-tab="document">
+                <svg class="icon-svg icon-xs" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" x2="8" y1="13" y2="13" />
+                  <line x1="16" x2="8" y1="17" y2="17" />
+                </svg>
+                <span>Documento</span>
+              </button>
+              <button type="button" class="preview-tab" data-preview-tab="markdown">
+                <svg class="icon-svg icon-xs" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+                <span>Markdown</span>
+              </button>
+              <button type="button" id="tab-btn-duplicates" class="preview-tab" data-preview-tab="duplicates">
+                <svg class="icon-svg icon-xs" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18" />
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                </svg>
+                <span>Duplicados</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="preview-toolbar-right">
+            <div class="search-field-wrapper search-field-compact">
+              <svg class="search-field-icon icon-svg icon-xs" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <input
+                type="search"
+                id="preview-search-input"
+                class="search-input has-icon search-input-sm"
+                placeholder="Filtrar en este libro..."
+                aria-label="Filtrar notas en este libro"
+              />
+            </div>
+
+            <button type="button" id="btn-open-config-toolbar" class="btn btn-secondary btn-sm" title="Abrir opciones avanzadas de formato y estructura">
+              <svg class="icon-svg icon-xs" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" x2="20" y1="21" y2="21" />
+                <line x1="4" x2="20" y1="14" y2="14" />
+                <line x1="4" x2="20" y1="7" y2="7" />
+                <circle cx="14" cy="7" r="2" />
+                <circle cx="8" cy="14" r="2" />
+                <circle cx="16" cy="21" r="2" />
+              </svg>
+              <span>Formato</span>
+            </button>
+
+            <button type="button" id="btn-export-active-book" class="btn btn-primary btn-sm" title="Exportar únicamente el libro previsualizado">
+              <svg class="icon-svg icon-xs" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" x2="12" y1="15" y2="3" />
+              </svg>
+              <span>Exportar libro</span>
+            </button>
+
+            <button type="button" id="btn-print-active-book" class="btn btn-ghost btn-sm" title="Imprimir o guardar vista actual como PDF">
+              <svg class="icon-svg icon-xs" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 6 2 18 2 18 9" />
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                <rect width="12" height="8" x="6" y="14" />
+              </svg>
+              <span>Imprimir</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="document-viewport">
+          <div id="live-preview-container" class="document-sheet"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Slide-Over Drawer: Advanced Format & Structure Settings (Progressive Disclosure) -->
+  <div id="config-drawer-backdrop" class="drawer-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="drawer-config-title">
+    <aside class="drawer-panel config-panel">
+      <div class="drawer-header">
+        <div>
+          <h3 id="drawer-config-title" class="drawer-title">Personalizar formato y estructura</h3>
+          <p class="drawer-subtitle">Los cambios se aplican en tiempo real sobre la vista previa y futuras exportaciones.</p>
+        </div>
+        <button type="button" id="btn-close-config" class="btn btn-ghost btn-icon" aria-label="Cerrar panel de formato">
+          <svg class="icon-svg icon-md" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" x2="6" y1="6" y2="18" />
+            <line x1="6" x2="18" y1="6" y2="18" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <!-- 1. Output Formats -->
+        <div class="config-section">
+          <div class="config-section-title">1. Formatos de salida</div>
+          <p class="config-section-desc">Elige uno o varios formatos para generar por cada libro seleccionado.</p>
+          <div class="format-cards-grid">
+            <label class="format-option-card">
+              <input type="checkbox" id="fmt-docx" checked />
+              <div class="format-option-content">
+                <span class="format-option-name">Word (.docx)</span>
+                <span class="format-option-hint">Editable con estilos nativos</span>
+              </div>
+            </label>
+            <label class="format-option-card">
+              <input type="checkbox" id="fmt-md" checked />
+              <div class="format-option-content">
+                <span class="format-option-name">Markdown (.md)</span>
+                <span class="format-option-hint">Ideal para Obsidian y Notion</span>
+              </div>
+            </label>
+            <label class="format-option-card">
+              <input type="checkbox" id="fmt-pdf" />
+              <div class="format-option-content">
+                <span class="format-option-name">PDF (.pdf)</span>
+                <span class="format-option-hint">Lectura directa e impresión</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 2. Content & Hierarchy -->
+        <div class="config-section">
+          <div class="config-section-title">2. Contenido y jerarquía</div>
+          <div class="config-fields-stack">
+            <div class="field-group">
+              <label class="field-label" for="cfg-content-filter">Qué anotaciones incluir</label>
+              <select id="cfg-content-filter" class="config-select">
+                <option value="all">Resaltados + Mis Notas vinculadas</option>
+                <option value="highlights_only">Solo Resaltados</option>
+                <option value="notes_only">Solo Mis Notas personales</option>
+                <option value="commented_highlights">Solo Resaltados comentados (con Nota)</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="cfg-grouping-mode">Cómo organizar el documento</label>
+              <select id="cfg-grouping-mode" class="config-select">
+                <option value="chapters">Organizar por Capítulos / Secciones</option>
+                <option value="by_tag">Organizar por Tipo (Dudas, Ideas, Referencias)</option>
+                <option value="continuous">Orden continuo por Posición / Página</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Visual Separator & Conflict Policy -->
+        <div class="config-section">
+          <div class="config-section-title">3. Estilo visual y sincronización</div>
+          <div class="config-fields-stack">
+            <div class="field-group">
+              <label class="field-label" for="cfg-separator-style">Diseño de cada cita</label>
+              <select id="cfg-separator-style" class="config-select">
+                <option value="callout_card">Tarjetas con borde lateral (Estudio)</option>
+                <option value="divider_line">Línea divisoria horizontal (───)</option>
+                <option value="numbered_list">Numeración secuencial (#1, #2...)</option>
+                <option value="minimal_space">Compacto minimalista</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="cfg-conflict-policy">Si el archivo ya existe en la carpeta destino</label>
+              <select id="cfg-conflict-policy" class="config-select">
+                <option value="replace">Reemplazar exportación previa</option>
+                <option value="keep_both">Conservar ambos (añadir fecha)</option>
+                <option value="skip_existing">Omitir libro ya exportado</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Metadata per Note -->
+        <div class="config-section">
+          <div class="config-section-title">4. Metadatos visibles por cita</div>
+          <div class="checkbox-grid">
+            <label class="checkbox-label">
+              <input type="checkbox" id="cfg-meta-page" checked />
+              <span>Número de página (Pág. X)</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="cfg-meta-location" checked />
+              <span>Posición en Kindle (Pos. X-Y)</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="cfg-meta-tags" checked />
+              <span>Etiquetas de estudio (Duda, Ref, #tags)</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="cfg-meta-date" />
+              <span>Fecha y hora de creación</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 5. Study Extras & Deduplication -->
+        <div class="config-section">
+          <div class="config-section-title">5. Opciones de estudio y limpieza</div>
+          <div class="checkbox-list">
+            <label class="checkbox-label">
+              <input type="checkbox" id="cfg-exec-summary" checked />
+              <span>Incluir resumen ejecutivo de Mis Notas y Dudas al inicio</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="cfg-include-bookmarks" />
+              <span>Incluir marcadores de página (Bookmarks) al final</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="cfg-author-filename" />
+              <span>Añadir nombre del autor al archivo exportado</span>
+            </label>
+          </div>
+          <div class="field-group" style="margin-top: 12px;">
+            <label class="field-label" for="cfg-dedup-strategy">Criterio al fusionar resaltados duplicados</label>
+            <select id="cfg-dedup-strategy" class="config-select">
+              <option value="latest">Conservar mi última corrección (más reciente)</option>
+              <option value="longest">Conservar la versión más extensa</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="drawer-footer">
+        <button type="button" id="btn-reset-config" class="btn btn-ghost">Restaurar predeterminados</button>
+        <button type="button" id="btn-done-config" class="btn btn-primary">Listo</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Modal for Editing Book Title & Author -->
+  <div id="modal-edit-book" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-edit-book-title">
+    <div class="modal-box">
+      <h3 id="modal-edit-book-title" class="modal-title">Editar título y autor</h3>
+      <form id="form-edit-book" class="modal-form">
+        <div class="field-group">
+          <label class="field-label" for="edit-book-title-input">Título limpio para exportación</label>
+          <input type="text" id="edit-book-title-input" class="search-input" required />
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="edit-book-author-input">Autor</label>
+          <input type="text" id="edit-book-author-input" class="search-input" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="btn-cancel-edit-book" class="btn btn-secondary">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <script src="./src/bundle.js"></script>
+</body>
+</html>

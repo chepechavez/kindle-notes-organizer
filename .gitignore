@@ -1,0 +1,16 @@
+# Archivos personales de notas y lecturas de Kindle (Privacidad)
+My Clippings.txt
+*.epub
+
+# Carpetas de destino de exportacion y sincronizacion
+dest/
+output/
+exports/
+.kindle-sync.json
+
+# Cache de Python y sistema
+__pycache__/
+*.py[cod]
+*$py.class
+.DS_Store
+Thumbs.db
